@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Informatika Adventure</title>
+<style>
+:root{--pn:#fffffff2;--tx:#2d2250;--ac:#8e6bd8;--bt:#ffd966;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--pn:#2b2347f2;--tx:#f3edff}}
+:root[data-theme=dark]{--pn:#2b2347f2;--tx:#f3edff}
+html,body{height:100%;margin:0;overflow:hidden;background:#cdb9f5;color:var(--tx);font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+#c{position:fixed;inset:0}
+#hud{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;display:flex;gap:6px;padding:6px;flex-wrap:wrap;z-index:3;pointer-events:none}
+#hud>*{pointer-events:auto;background:var(--pn);color:var(--tx);border:0;border-radius:14px;padding:5px 10px;font-weight:700;font-size:14px}
+button{font:inherit;cursor:pointer}
+.b{background:var(--ac);color:#fff;border:0;border-radius:14px;padding:10px 16px;font-weight:700;margin:4px;box-shadow:0 3px 0 #0003}
+.b.s{background:var(--bt);color:#4a3500}
+.b:active{transform:translateY(2px)}
+#pad{position:fixed;left:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,54px);gap:6px;z-index:3}
+.k{border-radius:50%;border:0;background:#ffffffcc;font-size:22px;color:#4a3a80;touch-action:none;font-weight:700}
+#jb{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:84px;height:84px;font-size:14px;z-index:3;background:#ffd966cc}
+#ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#4b2f9a66;z-index:9;padding:12px}
+#bx{background:var(--pn);color:var(--tx);border-radius:24px;padding:16px;width:100%;max-width:540px;max-height:90%;overflow:auto;box-shadow:0 10px 40px #0005;text-align:center}
+.tc{display:flex;gap:10px;align-items:flex-start;text-align:left;margin:8px 0}
+.av{font-size:48px;animation:bn .8s infinite alternate}
+.bb{background:#f0e8ff;color:#2d2250;border-radius:16px;padding:10px 12px;flex:1;line-height:1.4}
+.em{font-size:60px;animation:bn 1s infinite alternate}
+@keyframes bn{to{transform:translateY(-10px) rotate(6deg)}}
+.o{display:block;width:100%;text-align:left;background:#fff;color:#2d2250;border:2px solid #cdb9f5;border-radius:14px;padding:10px;margin:6px 0;font-weight:600}
+.o:hover{background:#efe6ff}
+input{font:inherit;padding:8px;border-radius:10px;border:2px solid #cdb9f5;margin:8px;text-align:center;width:70%}
+.cert{border:4px double #c9a227;background:#fffbe8;color:#4a3500;border-radius:12px;padding:12px;margin:8px 0}
+#ts{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#ffd966;color:#4a3500;font-weight:700;padding:8px 14px;border-radius:14px;z-index:20;display:none}
+</style></head><body>
+<div id="c"></div>
+<div id="hud"><div id="hs"></div><button onclick="rep()" title="Ulang penjelasan guru">📖</button><button onclick="pz()">⏸</button><button onclick="mute()">🔊</button><button onclick="fs()">⛶</button></div>
+<div id="pad"><button class="k" data-k="ArrowUp" style="grid-area:1/2" aria-label="Maju">▲</button><button class="k" data-k="ArrowLeft" style="grid-area:2/1" aria-label="Kiri">◀</button><button class="k" data-k="ArrowDown" style="grid-area:2/2" aria-label="Mundur">▼</button><button class="k" data-k="ArrowRight" style="grid-area:2/3" aria-label="Kanan">▶</button></div>
+<button id="jb" class="k" data-k="Space">LOMPAT</button>
+<div id="ov"><div id="bx"></div></div><div id="ts"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=i=>document.getElementById(i);
+const IC=["💻","🖱️","💿","🌐","📊","🤖","🔒"];
+const WN=["Pengenalan Komputer","Perangkat Keras","Perangkat Lunak","Jaringan Komputer","Microsoft Office","Kecerdasan Artifisial","Keamanan Digital"];
+const WC=[0xc8b6ff,0xa8e0ff,0xffc2e0,0xb8f0c0,0xfff0a0,0xd6c0ff,0xffd0b0];
+const COST=["Polos","Topi Merah","Mahkota","Kacamata Keren"],CH=["Anak Pink","Robot Biru","Alien Hijau","Kucing Kuning"];
+const TX=[
+["Komputer adalah mesin pintar: menerima data (input), mengolahnya (proses), lalu menampilkan hasil (output). Seperti kamu mengetik chat lalu HP mengirimkannya!","Komputer punya 3 bagian: hardware (yang bisa dipegang), software (program), dan brainware (manusia pengguna)."],
+["Hardware adalah bagian fisik. Keyboard dan mouse = input, monitor dan printer = output, CPU = otak yang memproses.","Contoh sehari-hari: saat mengetik tugas, keyboard memasukkan huruf, CPU mengolah, monitor menampilkannya."],
+["Software adalah program yang membuat hardware bisa bekerja. Sistem operasi seperti Windows, Android, atau Linux mengatur semuanya.","Aplikasi seperti browser dan game berjalan di atas sistem operasi. Antivirus melindungi dari program jahat."],
+["Jaringan komputer menghubungkan perangkat agar bisa berbagi data. LAN menghubungkan perangkat di area kecil seperti sekolah.","Router mengarahkan data ke internet, switch menyambungkan banyak perangkat dalam satu LAN. Seperti WiFi di kelasmu!"],
+["Microsoft Office punya tiga bintang: Word untuk dokumen, Excel untuk angka dan tabel, PowerPoint untuk presentasi.","Contoh: Word untuk laporan, Excel untuk daftar nilai (rumus =SUM menjumlahkan), PowerPoint untuk tugas presentasi."],
+["AI (Artificial Intelligence) adalah komputer yang belajar dari data untuk membuat prediksi atau keputusan.","Contohnya rekomendasi video, asisten suara, dan chatbot. AI membantu, tapi jawabannya tetap perlu kamu cek ya!"],
+["Jaga akunmu! Password kuat memakai huruf besar, kecil, angka, dan simbol, dan tidak dibagikan ke siapa pun.","Waspada phishing (pesan palsu pencuri data). Aktifkan verifikasi 2 langkah, dan beretika: jangan menyebar hoaks atau menghina orang."]];
+const Q=[[
+"Bagian komputer yang berbentuk fisik dan bisa disentuh disebut?|Hardware|Software|Brainware|Malware|0|Hardware adalah perangkat keras, yaitu bagian fisik komputer.",
+"Manakah yang termasuk perangkat lunak?|Mouse|Monitor|Browser|Printer|2|Browser adalah program (software). Mouse, monitor, dan printer adalah hardware.",
+"Manusia yang mengoperasikan komputer disebut?|Hardware|Brainware|Software|Firmware|1|Brainware adalah pengguna atau operator komputer.",
+"Urutan kerja komputer yang benar adalah?|Input-Proses-Output|Output-Input-Proses|Proses-Output-Input|Input-Output-Proses|0|Data dimasukkan (input), diolah (proses), lalu hasilnya ditampilkan (output).",
+"Komputer mengolah data mentah menjadi?|Listrik|Kabel|Informasi|Virus|2|Hasil pengolahan data disebut informasi."],[
+"Fungsi utama keyboard adalah?|Mencetak dokumen|Memasukkan huruf dan angka|Menampilkan gambar|Menyimpan listrik|1|Keyboard adalah perangkat input untuk mengetik huruf, angka, dan simbol.",
+"Bagian yang disebut otak komputer adalah?|Monitor|CPU|Mouse|Speaker|1|CPU memproses semua instruksi dan data.",
+"Printer berfungsi untuk?|Mencetak hasil ke kertas|Menggerakkan kursor|Memproses data|Mengetik|0|Printer adalah perangkat output yang mencetak dokumen ke kertas.",
+"Mouse termasuk perangkat?|Output|Input|Proses|Jaringan|1|Mouse memberi perintah ke komputer, jadi termasuk perangkat input.",
+"Monitor termasuk perangkat?|Input|Penyimpanan|Output|Proses|2|Monitor menampilkan hasil pengolahan, jadi termasuk perangkat output."],[
+"Contoh sistem operasi adalah?|Microsoft Word|Windows|Google Chrome|Paint|1|Windows adalah sistem operasi. Word, Chrome, dan Paint adalah aplikasi.",
+"Fungsi sistem operasi adalah?|Mengatur kerja hardware dan software|Mencetak kertas|Menyimpan listrik|Memperbesar layar|0|Sistem operasi adalah manajer yang mengatur seluruh sumber daya komputer.",
+"Android adalah?|Printer|Sistem operasi|Kabel|Prosesor|1|Android adalah sistem operasi untuk HP dan tablet.",
+"Software yang kode programnya terbuka dan boleh dikembangkan disebut?|Open source|Malware|Hardware|Spyware|0|Open source berarti kode sumbernya terbuka, contohnya Linux.",
+"Antivirus berfungsi untuk?|Mempercepat internet|Melindungi komputer dari program jahat|Mencetak dokumen|Mengganti baterai|1|Antivirus mendeteksi dan menghapus virus atau malware."],[
+"LAN adalah singkatan dari?|Large Area Network|Local Area Network|Long Access Net|Link And Network|1|LAN adalah jaringan area lokal, misalnya di satu sekolah.",
+"Fungsi router adalah?|Mencetak|Menghubungkan jaringan dan mengarahkan data|Mengetik|Menyimpan file|1|Router menghubungkan LAN ke internet dan menentukan jalur data.",
+"Switch berfungsi untuk?|Menyambungkan banyak perangkat dalam satu LAN|Menampilkan gambar|Mengubah password|Mengisi daya|0|Switch menghubungkan banyak komputer dalam satu jaringan lokal.",
+"Manfaat jaringan komputer adalah?|Berbagi file dan printer|Membuat komputer panas|Menghapus data|Mengurangi memori|0|Dengan jaringan, file, printer, dan internet bisa dipakai bersama.",
+"Internet adalah?|Satu komputer besar|Jaringan global yang menghubungkan banyak jaringan|Aplikasi chat|Sebuah kabel|1|Internet adalah jaringan dari jaringan di seluruh dunia."],[
+"Microsoft Word digunakan untuk?|Mengolah dokumen teks|Mengolah angka|Membuat presentasi|Mengedit video|0|Word adalah pengolah kata untuk surat, laporan, dan makalah.",
+"Excel paling cocok untuk?|Menulis surat|Menghitung dan mengolah data dalam tabel|Membuat slide|Menggambar|1|Excel adalah lembar kerja (spreadsheet) untuk angka dan tabel.",
+"Aplikasi untuk membuat presentasi adalah?|Word|Excel|PowerPoint|Notepad|2|PowerPoint membuat slide presentasi.",
+"Rumus Excel untuk menjumlahkan A1 sampai A5 adalah?|=SUM(A1:A5)|=ADD(A1,A5)|=PLUS(A1-A5)|=TOTAL(A1;A5)|0|Fungsi SUM menjumlahkan sekumpulan sel.",
+"Satu halaman dalam PowerPoint disebut?|Sheet|Slide|Paragraf|Folder|1|Presentasi terdiri dari beberapa slide."],[
+"AI adalah singkatan dari?|Automatic Internet|Artificial Intelligence|Applied Input|Advanced Interface|1|AI berarti kecerdasan artifisial atau kecerdasan buatan.",
+"AI belajar terutama dari?|Data|Baterai|Kabel|Printer|0|AI mempelajari pola dari banyak data.",
+"Manakah contoh penggunaan AI?|Rekomendasi video di aplikasi|Mengetik dengan keyboard|Mencolok kabel|Membuka tutup laptop|0|Rekomendasi video dibuat AI dengan mempelajari kebiasaan tontonanmu.",
+"Manfaat AI antara lain?|Membantu pekerjaan lebih cepat|Menggantikan semua belajar|Menghapus internet|Membuat listrik|0|AI membantu menerjemahkan, mencari info, dan mengenali gambar.",
+"Sikap bijak terhadap jawaban AI adalah?|Percaya begitu saja|Dicek kembali kebenarannya|Disalin tanpa dibaca|Diabaikan semua|1|AI bisa keliru, jadi periksa dengan sumber terpercaya."],[
+"Password yang kuat adalah?|123456|Nama sendiri|Kombinasi huruf besar, kecil, angka, dan simbol|Tanggal lahir|2|Kombinasi beragam membuat password sulit ditebak.",
+"Password sebaiknya dibagikan kepada?|Teman dekat|Siapa pun yang minta|Pacar|Tidak ada siapa pun|3|Password bersifat rahasia dan tidak boleh dibagikan.",
+"Phishing adalah?|Jenis game|Penipuan online untuk mencuri data|Aplikasi antivirus|Kabel jaringan|1|Phishing menyamar sebagai pihak tepercaya untuk mencuri data pribadi.",
+"Etika yang baik di internet adalah?|Menyebar hoaks|Sopan dan memeriksa informasi sebelum berbagi|Menghina orang|Memakai akun orang lain|1|Bersikap sopan dan tidak menyebar hoaks.",
+"Verifikasi dua langkah (2FA) berfungsi untuk?|Menambah lapisan keamanan akun|Mempercepat HP|Menghapus virus|Mengganti nama|0|Selain password, kamu butuh kode tambahan sehingga akun lebih aman."]
+].map(a=>a.map(s=>{const p=s.split('|');return{q:p[0],o:p.slice(1,5),a:+p[5],e:p[6]}}));
+
+/* ---------- state & storage ---------- */
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let PF=ld('ia_pf',{n:'',k:0,c:0,u:[0],a:[],b:0}),LB=ld('ia_lb',[]);
+const S={mode:'menu',sfx:1,mus:1,vo:1,score:0,coins:0,stars:0,ok:0,no:0,t:0,wn:0,talk:0};
+let w=0,P,TE,env,boxes=[],coins=[],flo=[],cl=[],sts=[],vy=0,ci,cq;
+const fmt=t=>(t/60|0)+':'+('0'+(t%60|0)).slice(-2);
+
+/* ---------- audio ---------- */
+let AC;function au(){if(!AC)try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+function bp(f,d=.12,ty='sine',v=.08,dl=0){if(!S.sfx||!AC)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+dl;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d)}
+const SF={coin:()=>{bp(988,.1,'square',.05);bp(1319,.2,'square',.05,.08)},ok:()=>[523,659,784,1047].forEach((f,i)=>bp(f,.2,'triangle',.1,i*.09)),no:()=>{bp(220,.25,'sawtooth',.07);bp(165,.3,'sawtooth',.07,.15)},jump:()=>bp(440,.12,'sine',.05)};
+const SC=[523,587,659,784,880,1047];let mi=0;
+setInterval(()=>{if(S.mus&&AC&&S.mode!='pause'){mi++;bp(SC[(Math.random()*6)|0],.45,'sine',.035);if(mi%4==0)bp(262,.5,'triangle',.04)}},430);
+function say(t){S.talk=1;setTimeout(()=>S.talk=0,2200);if(!S.vo||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,' '));u.lang='id-ID';u.rate=1.05;u.pitch=1.3;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- 3D ---------- */
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));$('c').appendChild(R.domElement);
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,1,.1,100);
+sc.background=new THREE.Color(0xbfe6ff);sc.fog=new THREE.Fog(0xbfe6ff,25,60);
+sc.add(new THREE.HemisphereLight(0xffffff,0xb8a0ff,1.1));
+const dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(5,10,5);sc.add(dl);
+function rs(){R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
+addEventListener('resize',rs);rs();
+const M=c=>new THREE.MeshLambertMaterial({color:c});
+const ms=(g,c,x=0,y=0,z=0)=>{const m=new THREE.Mesh(g,M(c));m.position.set(x,y,z);return m};
+const G={b:s=>new THREE.BoxGeometry(...s),s:r=>new THREE.SphereGeometry(r,16,12),c:(a,b,h)=>new THREE.CylinderGeometry(a,b,h,16)};
+function sp(t,sz,col='#000'){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.font='80px sans-serif';x.fillStyle=col;x.textAlign='center';x.textBaseline='middle';x.fillText(t,64,70);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true}));s.scale.set(sz,sz,1);return s}
+function mkP(k,cs){const g=new THREE.Group(),C=[0xff8fb8,0x7fd1ff,0x9be58f,0xffd966][k];
+g.add(ms(G.c(.45,.5,.9),C,0,.5,0));
+g.add(ms(k==1?G.b([.8,.7,.7]):G.s(.45),k==2?0xb8f0b0:0xffdcc0,0,1.45,0));
+[-.17,.17].forEach(x=>g.add(ms(G.s(.07),0x222222,x,1.5,k==1?.36:.41)));
+if(k==2)[-.2,.2].forEach(x=>{g.add(ms(G.c(.02,.02,.4),0x888888,x,2,0));g.add(ms(G.s(.08),0xff5a8a,x,2.22,0))});
+if(k==3)[-.28,.28].forEach(x=>g.add(ms(G.c(0,.14,.3),C,x,1.95,0)));
+if(cs==1)g.add(ms(G.c(.3,.46,.22),0xff6b6b,0,1.95,0));
+if(cs==2)g.add(ms(G.c(.38,.3,.3),0xffd700,0,2,0));
+if(cs==3)g.add(ms(G.b([.7,.14,.1]),0x222222,0,1.53,.42));
+return g}
+function mkT(){const g=new THREE.Group();
+g.add(ms(G.c(.5,.62,1.1),0x8e6bd8,0,.6,0));
+g.add(ms(G.b([.12,.5,.05]),0xff6b9d,0,.8,.56));
+g.add(ms(G.s(.5),0xffdcc0,0,1.65,0));
+g.add(ms(G.s(.53),0x4a2f1b,0,1.82,-.1));
+[-.2,.2].forEach(x=>{g.add(ms(G.s(.06),0x222222,x,1.68,.46));const r=new THREE.Mesh(new THREE.TorusGeometry(.12,.025,8,16),M(0x333333));r.position.set(x,1.68,.49);g.add(r)});
+const sm=new THREE.Mesh(new THREE.TorusGeometry(.12,.03,6,12,Math.PI),M(0xd9534f));sm.position.set(0,1.5,.47);sm.rotation.z=Math.PI;g.add(sm);
+const tb=ms(G.b([.6,.4,.05]),0x44ccff,.7,1,.4);tb.rotation.y=-.5;g.add(tb);
+return g}
+function setP(){if(P)sc.remove(P);P=mkP(PF.k,PF.c);P.position.set(0,0,9);P.rotation.y=Math.PI;sc.add(P)}
+function build(){if(env)sc.remove(env);env=new THREE.Group();sc.add(env);boxes=[];coins=[];flo=[];cl=[];sts=[];S.wn=0;
+const col=new THREE.Color(WC[w]);env.add(ms(G.c(20,20,1),col,0,-.5,0));env.add(ms(G.c(16,16,1.02),col.clone().offsetHSL(0,0,.08),0,-.5,0));
+for(let i=0;i<10;i++){const a=i/10*6.283,g=new THREE.Group();g.add(ms(G.b([1.8,1.1,.12]),0x333355,0,1.2,0));g.add(ms(G.b([1.6,.9,.05]),[0x66e0ff,0xff9ad5,0xb5ff9a][i%3],0,1.2,.08));g.add(ms(G.b([.2,.6,.2]),0x555577,0,.4,0));g.position.set(Math.sin(a)*17.5,0,Math.cos(a)*17.5);g.lookAt(0,0,0);env.add(g)}
+for(let i=0;i<6;i++){const a=i*1.05+.3,g=new THREE.Group();g.add(ms(G.b([.8,.8,.6]),0xaaddff,0,.6,0));g.add(ms(G.s(.35),0xffffff,0,1.3,0));g.add(ms(G.c(.02,.02,.4),0x888888,0,1.8,0));g.add(ms(G.s(.07),0xff5a8a,0,2.02,0));g.position.set(Math.sin(a)*13,0,Math.cos(a)*13);g.lookAt(0,0,0);env.add(g)}
+for(let i=0;i<4;i++){const g=new THREE.Group();g.add(ms(G.b([2,.15,.7]),0xffffff,0,.08,0));g.add(ms(G.b([1.8,.05,.5]),0x6655aa,0,.17,0));g.position.set(Math.sin(i*1.6+1)*11,0,Math.cos(i*1.6+1)*11);g.rotation.y=i;env.add(g)}
+for(let i=0;i<6;i++){const s=sp(IC[w],2.4);s.position.set(Math.sin(i*1.05)*10,3.5,Math.cos(i*1.05)*10-1);s.userData.y=3.5+i*.3;env.add(s);flo.push(s)}
+for(let i=0;i<8;i++){const g=new THREE.Group();[0,1,-1].forEach(d=>g.add(ms(G.s(1.4-Math.abs(d)*.3),0xffffff,d*1.3,0,0)));g.position.set((Math.random()-.5)*60,10+Math.random()*5,(Math.random()-.5)*60);env.add(g);cl.push(g)}
+for(let i=0;i<24;i++){const s=ms(new THREE.OctahedronGeometry(.3),0xffe066,(Math.random()-.5)*50,6+Math.random()*9,(Math.random()-.5)*50);env.add(s);sts.push(s)}
+for(let i=0;i<5;i++){const a=i/5*6.283+.3,g=new THREE.Group();g.add(ms(G.b([1.1,1.1,1.1]),0xffd24a,0,0,0));g.add(ms(G.b([1.15,.2,.2]),0xff6b9d,0,0,0));const q=sp('❓',1.5);q.position.y=1.3;g.add(q);g.position.set(Math.sin(a)*8,.9,Math.cos(a)*8-1);env.add(g);boxes.push({g,d:0})}
+for(let i=0;i<8;i++){const c=ms(G.c(.35,.35,.08),0xffc400);c.rotation.x=Math.PI/2;const a=Math.random()*6.283,r=3+Math.random()*11;c.position.set(Math.sin(a)*r,.8,Math.cos(a)*r);env.add(c);coins.push(c)}
+TE=mkT();TE.position.set(0,0,-3);env.add(TE);
+if(P){P.position.set(0,0,9);P.rotation.y=Math.PI}}
+
+/* ---------- UI helpers ---------- */
+const tc=m=>`<div class="tc"><div class="av">👩‍🏫</div><div class="bb">${m}</div></div>`;
+function D(h){$('bx').innerHTML=h;$('ov').style.display='flex'}
+function H(){$('ov').style.display='none';try{speechSynthesis.cancel()}catch(e){}}
+let tt;function toast(m){const e=$('ts');e.textContent=m;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',2600)}
+const ACH={first:'🎯 Jawaban Pertama',coin:'🪙 Kolektor Koin (20 koin)',perf:'✨ Dunia Sempurna',pro:'🏆 Juara (1500+ poin)',fin:'🎓 Lulusan Informatika'};
+function chk(e){const g=[];if(S.ok>=1)g.push('first');if(S.coins>=20)g.push('coin');if(e=='perf')g.push('perf');if(S.score>=1500)g.push('pro');if(e=='fin')g.push('fin');
+g.forEach(k=>{if(!PF.a.includes(k)){PF.a.push(k);sv('ia_pf',PF);toast('Pencapaian: '+ACH[k]);SF.ok()}})}
+
+/* ---------- menu & screens ---------- */
+function menu(){S.mode='menu';D(`<div class="em">🎮</div><h2 style="margin:4px">INFORMATIKA ADVENTURE</h2><div>Petualangan Belajar Bersama Guru Cilik</div><input id="nm" placeholder="Nama kamu" maxlength="14" value="${PF.n}"><div><b>Karakter</b></div><div id="chs"></div><div><b>Kostum</b></div><div id="cs"></div><button class="b" onclick="go()">▶ Mulai Petualangan</button><br><button class="b s" onclick="lb()">🏆 Peringkat</button><button class="b s" onclick="prof()">👤 Profil</button>`);rnd()}
+function rnd(){$('chs').innerHTML=CH.map((c,i)=>`<button class="b ${PF.k==i?'':'s'}" onclick="pk(${i})">${c}</button>`).join('');
+$('cs').innerHTML=COST.map((c,i)=>PF.u.includes(i)?`<button class="b ${PF.c==i?'':'s'}" onclick="pc(${i})">${c}</button>`:`<button class="b s" disabled>🔒 ?</button>`).join('')}
+function pk(i){PF.k=i;setP();rnd()}
+function pc(i){PF.c=i;setP();rnd()}
+function go(){au();const n=($('nm').value||'').replace(/[^\w \-.]/g,'').trim();PF.n=n||'Pemain';sv('ia_pf',PF);
+Object.assign(S,{score:0,coins:0,stars:0,ok:0,no:0,t:0,wn:0});w=0;build();intro()}
+function lb(){D(`<h3>🏆 Papan Peringkat</h3>`+(LB.length?LB.map((r,i)=>`<div>${i+1}. <b>${r.n}</b> — ${r.s} poin (${fmt(r.t)})</div>`).join(''):'<div>Belum ada skor. Jadilah yang pertama!</div>')+`<button class="b" onclick="menu()">◀ Kembali</button>`)}
+function prof(){D(`<h3>👤 Profil: ${PF.n||'Pemain'}</h3><div>Skor terbaik: <b>${PF.b}</b></div><div>Kostum: ${PF.u.map(i=>COST[i]).join(', ')}</div><div>Pencapaian:<br>${PF.a.length?PF.a.map(k=>ACH[k]).join('<br>'):'Belum ada'}</div><button class="b" onclick="menu()">◀ Kembali</button>`)}
+function intro(i=0){S.mode='dlg';const p=TX[w],last=i>=p.length;
+const m=last?`Tantangan! Temukan dan buka 5 Mystery Box ❓ di dunia ini. Jawab benar untuk dapat 100 poin, koin, dan bintang!<br><small>🕹️ Panah/WASD = jalan, Spasi = lompat. Ambil juga koin emas!</small>`:(i==0?`Halo ${PF.n}! Selamat datang di dunia ini. `:'')+p[i];
+D(`<div class="em">${IC[w]}</div><b>Dunia ${w+1}: ${WN[w]}</b>`+tc(m)+`<button class="b" onclick="${last?"H();S.mode='play'":'intro('+(i+1)+')'}">${last?'Mulai! 🚀':'Lanjut ▶'}</button>`);say(m)}
+function rep(){if(S.mode=='play')intro()}
+function qz(i){S.mode='dlg';ci=i;cq=Q[w][i];showQ()}
+function showQ(){D(`<b>🎁 Mystery Box ${ci+1}/5</b>`+tc(cq.q)+cq.o.map((o,k)=>`<button class="o" onclick="an(${k})">${'ABCD'[k]}. ${o}</button>`).join(''));say(cq.q)}
+function an(k){if(k==cq.a){SF.ok();S.score+=100;S.ok++;S.stars++;const b=1+(Math.random()*3|0);S.coins+=b;let ex='';
+if(Math.random()<.3){const n=[1,2,3].find(x=>!PF.u.includes(x));if(n!=null){PF.u.push(n);sv('ia_pf',PF);ex=`<br>🎁 Hadiah Mystery Box: kostum baru <b>${COST[n]}</b>! (pilih di menu)`}}
+boxes[ci].d=1;boxes[ci].g.visible=false;
+D(tc(`Benar! 🎉 +100 poin, +${b} koin, +1 ⭐<br>${cq.e}${ex}`)+`<button class="b" onclick="nx()">Lanjut ▶</button>`);say('Benar! '+cq.e);chk()}
+else{SF.no();S.no++;S.wn++;D(tc(`Ups, belum tepat 😅<br>${cq.e}<br>Yuk coba lagi!`)+`<button class="b" onclick="showQ()">Coba lagi 🔁</button>`);say('Ups, belum tepat. '+cq.e)}}
+function nx(){if(boxes.every(b=>b.d))wend();else{H();S.mode='play'}}
+function wend(){S.mode='dlg';const pf=S.wn==0;if(pf){S.score+=200;chk('perf')}
+if(w<6)D(`<div class="em">🏅</div>`+tc(`Dunia ${w+1} selesai!${pf?' Sempurna tanpa salah, bonus +200 poin! ✨':''} Siap ke dunia berikutnya: ${WN[w+1]}?`)+`<button class="b" onclick="nw()">Dunia berikutnya ▶</button>`);else fin()}
+function nw(){w++;build();intro()}
+function fin(){S.mode='end';chk('fin');LB.push({n:PF.n,s:S.score,t:Math.round(S.t)});LB.sort((a,b)=>b.s-a.s);LB=LB.slice(0,10);sv('ia_lb',LB);PF.b=Math.max(PF.b,S.score);sv('ia_pf',PF);SF.ok();
+D(`<div class="em">🎓</div>`+tc(`Selamat ${PF.n}! Kamu menyelesaikan semua dunia informatika! Kamu hebat sekali! 🎉`)+`<div>⭐ Skor: <b>${S.score}</b> · ✅ Benar: <b>${S.ok}</b> · ❌ Salah: <b>${S.no}</b> · 🪙 ${S.coins} · ⏱ ${fmt(S.t)}</div><div class="cert">🏅 <b>SERTIFIKAT KELULUSAN</b><br>Diberikan kepada<br><big><b>${PF.n}</b></big><br>yang telah menyelesaikan 7 dunia INFORMATIKA ADVENTURE<br>Skor ${S.score} · ${new Date().toLocaleDateString('id-ID')}</div><button class="b" onclick="menu()">🔁 Main Lagi</button><button class="b s" onclick="lb()">🏆 Peringkat</button>`);say(`Selamat ${PF.n}! Kamu menyelesaikan semua dunia informatika!`)}
+function pz(){if(S.mode=='play'||S.mode=='pause'){S.mode='pause';D(`<h3>⏸ Jeda</h3><button class="b" onclick="tg('mus')">🎵 Musik: ${S.mus?'ON':'OFF'}</button><button class="b" onclick="tg('sfx')">🔊 Efek: ${S.sfx?'ON':'OFF'}</button><button class="b" onclick="tg('vo')">🗣️ Suara guru: ${S.vo?'ON':'OFF'}</button><br><button class="b s" onclick="H();S.mode='play'">▶ Lanjut</button><button class="b s" onclick="menu()">🏠 Menu</button>`)}}
+function tg(k){S[k]=!S[k];pz()}
+function mute(){const m=S.sfx&&S.mus;S.sfx=S.mus=S.vo=m?0:1;toast(m?'Suara dimatikan':'Suara dinyalakan');if(m)try{speechSynthesis.cancel()}catch(e){}}
+function fs(){const d=document.documentElement;try{Promise.resolve(document.fullscreenElement?document.exitFullscreen():d.requestFullscreen()).catch(()=>{})}catch(e){}}
+
+/* ---------- input ---------- */
+const K={};
+addEventListener('keydown',e=>{au();const k=e.key.length>1?e.key:e.key.toLowerCase();K[k]=1;if(S.mode=='play'&&(k.startsWith('Arrow')||k==' '))e.preventDefault()});
+addEventListener('keyup',e=>{K[e.key.length>1?e.key:e.key.toLowerCase()]=0});
+document.querySelectorAll('.k').forEach(b=>{const k=b.dataset.k=='Space'?' ':b.dataset.k;
+b.addEventListener('pointerdown',e=>{e.preventDefault();au();K[k]=1});
+['pointerup','pointerleave','pointercancel'].forEach(v=>b.addEventListener(v,()=>K[k]=0))});
+
+/* ---------- loop ---------- */
+let last=0,hc='';
+function loop(t){requestAnimationFrame(loop);const dt=Math.min((t-last)/1000,.05);last=t;const T=t/1000;
+flo.forEach((s,i)=>s.position.y=s.userData.y+Math.sin(T*2+i)*.4);
+cl.forEach(c=>{c.position.x+=dt*.6;if(c.position.x>32)c.position.x=-32});
+sts.forEach(s=>s.rotation.y+=dt*2);
+boxes.forEach((b,i)=>{b.g.rotation.y+=dt;b.g.position.y=.9+Math.sin(T*2+i)*.15});
+coins.forEach(c=>c.rotation.z+=dt*3);
+if(TE){TE.position.y=Math.abs(Math.sin(T*(S.talk?6:2)))*(S.talk?.4:.08);TE.lookAt(P.position.x,TE.position.y,P.position.z)}
+if(S.mode=='play'){S.t+=dt;
+const f=(K.ArrowUp||K.w?1:0)-(K.ArrowDown||K.s?1:0),tr=(K.ArrowLeft||K.a?1:0)-(K.ArrowRight||K.d?1:0);
+P.rotation.y+=tr*2.6*dt;const y=P.rotation.y;
+P.position.x+=Math.sin(y)*f*6*dt;P.position.z+=Math.cos(y)*f*6*dt;
+const r=Math.hypot(P.position.x,P.position.z);if(r>16){P.position.x*=16/r;P.position.z*=16/r}
+if(K[' ']&&P.position.y==0){vy=8;SF.jump()}
+vy-=22*dt;P.position.y+=vy*dt;if(P.position.y<=0){P.position.y=0;vy=0}
+P.rotation.z=f?Math.sin(T*12)*.08:0;
+boxes.forEach((b,i)=>{if(!b.d&&Math.hypot(P.position.x-b.g.position.x,P.position.z-b.g.position.z)<1.4&&P.position.y<2){K.ArrowUp=K.w=0;qz(i)}});
+for(let i=coins.length-1;i>=0;i--){const c=coins[i];if(Math.hypot(P.position.x-c.position.x,P.position.z-c.position.z)<1.1&&P.position.y<1.5){env.remove(c);coins.splice(i,1);S.coins++;SF.coin();chk()}}
+const tx=P.position.x-Math.sin(y)*6.5,tz=P.position.z-Math.cos(y)*6.5,k=Math.min(1,5*dt);
+cam.position.x+=(tx-cam.position.x)*k;cam.position.z+=(tz-cam.position.z)*k;cam.position.y+=(4.5+P.position.y*.5-cam.position.y)*k;
+cam.lookAt(P.position.x,P.position.y+1.2,P.position.z)}
+else if(S.mode=='menu'){cam.position.set(Math.sin(T*.3)*14,6,Math.cos(T*.3)*14+4);cam.lookAt(0,1.5,5)}
+else{const y=P.rotation.y;cam.lookAt(P.position.x,P.position.y+1.2,P.position.z)}
+const h=`Lv ${w+1}/7 ${WN[w]} · 🏁 ${S.score} · ⭐ ${S.stars} · 🪙 ${S.coins} · ⏱ ${fmt(S.t)} · 📦 ${boxes.filter(b=>!b.d).length}`;
+if(h!=hc){hc=h;$('hs').textContent=h}
+R.render(sc,cam)}
+setP();build();menu();requestAnimationFrame(loop);
+</script></body></html>
